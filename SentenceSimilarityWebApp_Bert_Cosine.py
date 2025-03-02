@@ -4,6 +4,9 @@ from transformers import BertTokenizer, BertModel
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Author: Sandeep Belgavi
+# Date: 2023-10-05
+
 app = Flask(__name__)
 
 # Load pre-trained BERT model and tokenizer
