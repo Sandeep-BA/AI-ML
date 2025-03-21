@@ -67,6 +67,24 @@ Created on: 2023-10-05
         th {
             background-color: #f2f2f2;
         }
+        .scrollable-table {
+            max-height: 200px;
+            overflow-y: auto;
+            display: block;
+        }
+        .high-similarity {
+            background-color: #d4edda;
+        }
+        .moderate-similarity {
+            background-color: #fff3cd;
+        }
+        .low-similarity {
+            background-color: #f8d7da;
+        }
+        .correct-guess {
+            background-color: #006400;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -75,10 +93,13 @@ Created on: 2023-10-05
     <p>Welcome to the Word Context Game! The goal of the game is to guess the target word based on its context. Enter your guess below and see how similar it is to the target word.</p>
     <p>The similarity score ranges from -1 to 1:</p>
     <table>
+        <thead>
         <tr>
             <th>Score Range</th>
             <th>Description</th>
         </tr>
+        </thead>
+        <tbody>
         <tr>
             <td>1</td>
             <td>Identical to the target word</td>
@@ -99,6 +120,7 @@ Created on: 2023-10-05
             <td>-1 to -0.01</td>
             <td>Negative similarity</td>
         </tr>
+        </tbody>
     </table>
     <form id="guess-form">
         <label for="difficulty">Select difficulty:</label>
@@ -112,6 +134,19 @@ Created on: 2023-10-05
         <button type="submit">Submit</button>
     </form>
     <p id="result"></p>
+    <div class="scrollable-table">
+        <table id="guesses-table">
+            <thead>
+            <tr>
+                <th>Guess</th>
+                <th>Similarity</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Guesses will be appended here -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -129,6 +164,30 @@ Created on: 2023-10-05
         .then(response => response.json())
         .then(data => {
             document.getElementById('result').textContent = data.result;
+            if (data.similarity !== null) {
+                const tableBody = document.getElementById('guesses-table').querySelector('tbody');
+                const newRow = document.createElement('tr');
+                const guessCell = document.createElement('td');
+                const similarityCell = document.createElement('td');
+                guessCell.textContent = guess;
+                similarityCell.textContent = data.similarity.toFixed(4);
+
+                if (data.similarity === 1) {
+                    newRow.classList.add('correct-guess');
+                    document.getElementById('difficulty').querySelector(`option[value="${difficulty}"]`).disabled = true;
+                    alert('Congratulations! You found the word. Please select a different difficulty level to restart the game.');
+                } else if (data.similarity >= 0.5) {
+                    newRow.classList.add('high-similarity');
+                } else if (data.similarity >= 0.1) {
+                    newRow.classList.add('moderate-similarity');
+                } else {
+                    newRow.classList.add('low-similarity');
+                }
+
+                newRow.appendChild(guessCell);
+                newRow.appendChild(similarityCell);
+                tableBody.appendChild(newRow);
+            }
         });
     });
 </script>
